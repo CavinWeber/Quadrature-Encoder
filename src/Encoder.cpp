@@ -1,17 +1,21 @@
 #include "Encoder.h"
 #include <driver/gpio.h>
 
-RotaryEncoder::RotaryEncoder(int A, int B)
+QuadratureEncoder::QuadratureEncoder(int A, int B)
     : APin(A), BPin(B), encoderValue(0), AOld(false), BOld(false), interrupt(false), APinReg(32 - APin - 1), BPinReg(32 - BPin - 1) {}
   
-void RotaryEncoder::begin() {
+void QuadratureEncoder::begin() {
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);
   AOld = digitalRead(APin);
   BOld = digitalRead(BPin);
 }
 
-int RotaryEncoder::read()
+int QuadratureEncoder::read()
+/**
+ * Standard read of a quadrature encoder using standard digitalRead().
+ * Slower than direct write, but much more reliable in Arduino.
+ */
 {
   bool ANew = digitalRead(APin);
   bool BNew = digitalRead(BPin);
@@ -36,7 +40,12 @@ int RotaryEncoder::read()
   return encoderValue;
 }
 
-int RotaryEncoder::fastRead()
+int QuadratureEncoder::fastRead()
+/**
+ * This type of read is designed for fast-as-possible value reading using
+ * port manipulation. This is likely only valid on a Teensy 4.0
+ * microcontroller.
+ */
 {
   bool ANew = *gpio_in_reg >> APinReg & 1;
   bool BNew = *gpio_in_reg >> BPinReg & 1;

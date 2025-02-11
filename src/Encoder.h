@@ -1,17 +1,22 @@
+/**
+ * This library is designed to do a fast-as-possible read of a quadrature encoder
+ * using only bitwise math. On most processors, the quadrature read should only
+ * take a handful of cycles with minimal branching.
+ */
+
 #ifndef ENCODER_H
 #define ENCODER_H
 
 #include <Arduino.h>
 
-class RotaryEncoder{
+class QuadratureEncoder{
     public:
-    RotaryEncoder(int APin, int BPin);
+    QuadratureEncoder(int APin, int BPin);
     void begin();
     int read();
     int readInterrupt();
     void enableInterrupts();
     int fastRead();
-    
 
     private:
     int APin;
@@ -26,7 +31,7 @@ class RotaryEncoder{
     uint8_t BPinReg;
     volatile uint32_t *gpio_in_reg = (volatile uint32_t *)GPIO_IN_REG;
     uint32_t reg_value;
-    // static RotaryEncoder* instance; // Static instance to be used by the interrupt routine
+    // static QuadratureEncoder* instance; // Static instance to be used by the interrupt routine
 };
 
 

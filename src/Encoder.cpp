@@ -40,6 +40,29 @@ int QuadratureEncoder::read()
   return encoderValue;
 }
 
+void QuadratureEncoder::read_ISR()
+/**
+ * Standard read of a quadrature encoder using standard digitalRead().
+ * Designed for use in an ISR based on the "alter" state of the A and B pins.
+ */
+{
+  bool ANew = digitalRead(APin);
+  bool BNew = digitalRead(BPin);
+
+  byte AOldBOld = AOld << 1 | BOld; // Create bit couple for old values
+  byte ANewBNew = ANew << 1 | BNew; // Create bit couple for new values
+  byte ATestBTest = (ANewBNew >> 1) | ((!BNew) << 1);
+
+  if (AOldBOld ^ ATestBTest) {
+    encoderValue++; // Right turn
+  } else {
+    encoderValue--; // Left turn
+  }
+
+  AOld = ANew;
+  BOld = BNew;
+}
+
 int QuadratureEncoder::fastRead()
 /**
  * This type of read is designed for fast-as-possible value reading using
@@ -68,4 +91,24 @@ int QuadratureEncoder::fastRead()
   BOld = BNew;
   
   return encoderValue;
+}
+
+void QuadratureEncoder::readNoBranch_ISR()
+/**
+ * Standard read of a quadrature encoder using standard digitalRead().
+ * Uses additional bitmath to avoid branching altogether.
+ * Proof of concept. Does not return or modify any variables.
+ */
+{
+  bool ANew = digitalRead(APin);
+  bool BNew = digitalRead(BPin);
+
+  byte AOldBOld = AOld << 1 | BOld; // Create bit couple for old values
+  byte ANewBNew = ANew << 1 | BNew; // Create bit couple for new values
+  byte ATestBTest = (ANewBNew >> 1) | ((!BNew) << 1);
+
+  encoderValue += ((int(AOldBOld ^ ATestBTest) * 2) - 1); // Full compare and encoderValue manipulation operation.
+
+  AOld = ANew;
+  BOld = BNew;
 }

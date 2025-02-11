@@ -14,7 +14,9 @@ class QuadratureEncoder{
     QuadratureEncoder(int APin, int BPin);
     void begin();
     int read();
+    void read_ISR();
     int readInterrupt();
+    void readNoBranch_ISR();
     void enableInterrupts();
     int fastRead();
 
